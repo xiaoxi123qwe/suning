@@ -97,8 +97,10 @@
 	//leftbar
 	let tips=document.querySelectorAll(".leftbar_menu");
 	let container=document.querySelectorAll(".container");
+	var flag=true;
 	tips.forEach(function(ele,index){
 		ele.onclick=function(){
+			flag=false;
 			let ot=container[index].offsetTop-70;
 			let now=document.documentElement.scrollTop;
 			// document.documentElement.scrollTop=ot;
@@ -109,22 +111,25 @@
 				now+=speed;
 				if (time===200) {
 					clearInterval(t);
+					flag=true;
 				}
 				document.documentElement.scrollTop=now;
 			}, 25);
 		}
-		window.addEventListener("scroll", function(){
+	});
+	window.addEventListener("scroll", function(){
+		if(flag){
 			let st=document.documentElement.scrollTop;
 			for (let i = 0; i <container.length; i++) {
-				if(st>container[i].offsetTop-100){
+				if(st>=container[i].offsetTop-70){
 					for (let i =0;i< tips.length; i++) {
 						tips[i].classList.remove("active");
 					}
 					tips[i].classList.add("active");
 				}
 			}
-		})
-	})
+		}		
+	});
 }
 //排行榜
 {
@@ -133,45 +138,67 @@
 	let inner=document.querySelector(".haohuo_inner");
 	let items=document.querySelectorAll(".haohuo_bottom_main");
 	let pages=document.querySelectorAll(".paihang_dian1");
-	let n=0;
-	let obj=pages[0];
+	let n=1;
+	let obj=pages[1];
 	const l=pages.length;
-	next.onclick=function( ){
-		n++;
-		if(n===l){
-			n=0;
-			inner.style.marginLeft=0;
-			pages[l-1].classList.remove("paihang_dian2");
-			pages[n].classList.add("paihang_dian2");
-		}else{
-			inner.style.marginLeft=-n*370+"px";
-			pages[n-1].classList.remove("paihang_dian2");
-			pages[n].classList.add("paihang_dian2");
-			obj=pages[n];
-		}	
-	}
-	prev.onclick=function( ){
-		n--;
-		if(n===-1){
-			n=l-1;
-			inner.style.marginLeft=-n*370+"px";
-			pages[0].classList.remove("paihang_dian2");
-			pages[n].classList.add("paihang_dian2");
-		}else{
-			inner.style.marginLeft=-n*370+"px";
-			pages[n+1].classList.remove("paihang_dian2");
-			pages[n].classList.add("paihang_dian2");
-			obj=pages[n];
-		}
-	}	
+    let flag=true;
+    function move(){
+        if(flag===false){
+            inner.style.transition="all .5s ease";
+            inner.style.marginLeft=-370*n+"px";
+        }
+    }
+    next.onclick=function () {
+        if(flag){
+            flag=false;
+            n++;
+            move();
+        }
+    };
+    prev.onclick=function () {
+        if(flag){
+            flag=false;
+            n--;
+            move();
+        }
+    };
+	inner.addEventListener("transitionend", function(){
+		flag=true;
+        if(n===4){
+            inner.style.transition="none";
+            inner.style.marginLeft="-370px";
+            n=1;
+        }
+        if(n===0){
+            inner.style.transition="none";
+            inner.style.marginLeft="-1110px";
+            n=3;
+        }
+        if(n>0&&n<4){
+            for (let i = 0; i <l; i++) {
+                pages[i].classList.remove("paihang_dian2");
+            }
+            pages[n-1].classList.add("paihang_dian2");
+        }else if(n===0){
+            for (let i = 0; i <l; i++) {
+                pages[i].classList.remove("paihang_dian2");
+            }
+            pages[3].classList.add("paihang_dian2");
+        }else if(n===4){
+            for (let i = 0; i <l; i++) {
+                pages[i].classList.remove("paihang_dian2");
+            }
+            pages[1].classList.add("paihang_dian2");
+        }
+	});
 	pages.forEach(function(ele,index){
 		ele.onmouseenter=function(){
 			obj.classList.remove("paihang_dian2");
 			ele.classList.add("paihang_dian2");
 			obj=ele;
-			inner.style.marginLeft=-index*370+"px";
-			n=index;
-		}	
+			inner.style.marginLeft=-(index+1)*370+"px";
+			n=index+1;
+		}
 	})
 }
 //视频
@@ -182,40 +209,55 @@
 	let items=document.querySelectorAll(".shipin_more");
 	let tips=document.querySelectorAll(".shipin_more1");
 	let content=document.querySelectorAll(".shipin_content1");
-	let n=0;
-	const l=items.length;
-	next.onclick=function( ){
-		n++;
-		if(n===l){
-			n=0;
-			inner.style.marginLeft=0;
-		}else{
-			inner.style.marginLeft=-n*390+"px";
-		}	
-	}
-	prev.onclick=function( ){
-		n--;
-		if(n===-1){
-			n=l-1;
-			inner.style.marginLeft=-n*390+"px";
-		}else{
-			inner.style.marginLeft=-n*390+"px";
-			obj=tips[n];
-		}
-	}
-	let obj=tips[0];
-	tips.forEach(function(ele,index){
-		ele.onmouseenter=function(){
-			obj.classList.remove("active");
-			ele.classList.add("active");
-			obj=ele;
-			content[index].classList.add("active");
-			// n=index;
-		}
-		ele.onmouseleave=function(){
-			content[index].classList.remove("active");	
-		}	
-	})	
+    let n=1;
+    let obj=tips[0];
+    const l=items.length;
+    let flag=true;
+    function move(){
+        if(flag===false){
+            inner.style.transition="all .5s ease";
+            inner.style.marginLeft=-390*n+"px";
+        }
+    }
+    next.onclick=function () {
+        if(flag){
+            flag=false;
+            n++;
+            move();
+        }
+    };
+    prev.onclick=function () {
+        if(flag){
+            flag=false;
+            n--;
+            move();
+        }
+    };
+    inner.addEventListener("transitionend", function(){
+        flag=true;
+        if(n===3){
+            inner.style.transition="none";
+            inner.style.marginLeft="-390px";
+            n=1;
+        }
+        if(n===0){
+            inner.style.transition="none";
+            inner.style.marginLeft="-780px";
+            n=2;
+        }
+    });
+    tips.forEach(function(ele,index){
+        ele.onmouseenter=function(){
+            obj.classList.remove("active");
+            ele.classList.add("active");
+            obj=ele;
+            content[index].classList.add("active");
+            // n=index;
+        }
+        ele.onmouseleave=function(){
+            content[index].classList.remove("active");
+        }
+    })
 }
 //banner侧边框
 {
@@ -264,4 +306,11 @@
 			inner.style.marginLeft=-555*n+"px";
 		}
 	
+}
+//右侧
+{
+    let totop=document.querySelector(".right_item_top");
+    totop.onclick=function(){
+        document.documentElement.scrollTop=0;
+    }
 }
